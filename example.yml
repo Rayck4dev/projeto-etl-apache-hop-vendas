@@ -1,0 +1,54 @@
+example yml
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: project-apache-hop
+    restart: always
+    environment:
+      POSTGRES_USER: hopsuser
+      POSTGRES_PASSWORD: hp12332da
+      POSTGRES_DB: Dbhsops
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - hop-net
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: 6365813
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    networks:
+      - hop-net
+
+  hop-web:
+    image: apache/hop-web:latest
+    container_name: hop-web
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./hop-projects:/files
+      - ./hop-config:/root/.hop
+    depends_on:
+      - postgres
+    networks:
+      - hop-net
+
+networks:
+  hop-net:
+
+volumes:
+  postgres_data:
+  pgadmin_data:
